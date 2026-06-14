@@ -1,39 +1,35 @@
 #pragma once
 
-/*_______________________________________________________
-*                                                        
-*    Initial Data: 20/05/2026           
-*    
-*    Last update: 04/06/2026 - 0.2V
-*
-*    Author: Lucas O. Magalhaes.                         
-*
-*                                                        
-*    Title:  Ring buffer algorithm                       
-*                                                        
-*
-*   Desc: This libraby is a implementation of a ring buffer
-*    algorithm, it is designed to be used in embedded systems 
-*    without RTOS, specifically in bare-metal applications,
-*    with low cost MCUs, and it is optimized for flexibily
-*     ever kind of data is supported, since raw bytes or 
-*    complex structures can be manipulated with the same APIS.
-*
-*    support:
-*
-*      -Wrap around or without overwriting
-*      -Padding matters or not (atomic allocation of data blocks)
-*      -Critical section callback
-*      -Optimized version for power of 2 buffer sizes
-* 
-*   How to use opmized version: 
-*     >> defining  _RB_OPTIMIZED_VERSION macro before including the header file. 
-*        (optimized version only works with buffer sizes that are a power of 2).
-*     
-*    
-*                                                        
-*________________________________________________________
+/**
+ * @file ringbuffer.h
+ * @author Lucas O. Magalhaes
+ * 
+ * @brief  containing the definitions of the ring buffer structure, 
+ * enumeration for return messages, and prototypes for the library's functions.
+ * 
+ * @details This libraby is a implementation of a ring buffer
+ *  algorithm, it is designed to be used in embedded systems 
+ *  without RTOS, specifically in bare-metal applications,
+ *  with low cost MCUs, and it is optimized for flexibily
+ *  ever kind of data is supported, since raw bytes or 
+ *  complex structures can be manipulated with the same APIS.
+ * 
+ * @note This library have a configurable behavior, if the user 
+ *  define #define _RB_OPTIMIZED_VERSION before including the
+ *  header file, the library will use an optimized version of 
+ *  the push and pop functions that are faster but only work with
+ *  buffer sizes that are a power of 2. Also the user can choose if the 
+ *  buffer will overwrite old data when it is full, or if it will block 
+ *  new data until there is space available.
+ *  Also, the user can choose if the library will consider the padding of the data, 
+ *  meaning that if the user tries to push a block of data that is larger than the 
+ *  available space, the library will return an error instead of pushing only part of the data.
+ * 
+ * @warning If using the optimized version, the buffer size must be a power of 2, otherwise the library will return an error.
+ * @version 0.1
+ * @date 2026-06-04
 */
+
 
 #pragma region includes
 
@@ -42,6 +38,10 @@
   #include <stddef.h>
 
 #pragma end region
+
+#ifdef __cplusplus
+  extern "C"{
+#endif
 
 /**
  * @brief Enumeration return mensages for ring buffer library operation results.
@@ -178,5 +178,9 @@ struct ring_buffer{
   __attribute__((weak)) void rb_critical_exit(void);
 
 #pragma endregion
+
+#ifdef __cplusplus
+  }
+#endif
 
 // Ring buffer lib end.

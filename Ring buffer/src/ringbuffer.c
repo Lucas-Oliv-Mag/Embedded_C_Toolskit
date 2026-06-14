@@ -1,9 +1,5 @@
 #include "ringbuffer.h"
 
-#ifdef __cplusplus
-  extern "C"{
-#endif
-
 
 #define _RB_LOCK_() do{rb_critical_section(); \
   if(ptr->lock == false){ ptr->lock = true; }else{ rb_critical_exit(); return RB_LOCKED; } \
@@ -262,17 +258,11 @@ enum rb_msg ringbf_used(struct ring_buffer * ptr, uint16_t * data_out){
   return RB_SUCESS;
 }
 
+
+__attribute__((weak)) void rb_critical_section(void){ } // Default empty implementation for critical section entry.  
+
+
+__attribute__((weak)) void rb_critical_exit(void)   { } // Default empty implementation for critical section exit.
+
+
 #pragma end region
-
-//____________________________________________________________________________________________
-
-
-
-#pragma endregion
-
-
-
-
-#ifdef __cplusplus
-  }
-#endif
