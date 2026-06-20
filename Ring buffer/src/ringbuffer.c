@@ -1,5 +1,6 @@
 #include "ringbuffer.h"
 
+#pragma region Macros
 
 #define _RB_LOCK_() do{rb_critical_section(); \
   if(ptr->lock == false){ ptr->lock = true; }else{ rb_critical_exit(); return RB_LOCKED; } \
@@ -9,12 +10,13 @@
 #define _RB_POWER_OF_2_CHECK(x) ((x & (x - 1)) == 0)
 // Check if a number is a power of 2.
 
+#pragma endregion
 
 //_____________________________________________________________________________________________
 
 #pragma region Standart Fx
 
-enum rb_msg ringbf_init(struct ring_buffer * ptr, const uint16_t max_size, const uint8_t* buffer){
+enum rb_msg ringbf_init(struct ring_buffer * ptr, uint16_t max_size, const uint8_t* buffer){
 
   if(ptr == NULL || buffer == NULL || max_size == 0){ return RB_PARAM_ERR;  }
 
@@ -37,7 +39,7 @@ enum rb_msg ringbf_init(struct ring_buffer * ptr, const uint16_t max_size, const
   rb_critical_exit();
 
 
-  return RB_SUCESS;
+  return RB_SUCCESS;
 }
 
 
@@ -47,6 +49,7 @@ enum rb_msg ringbf_config(struct ring_buffer * ptr, bool overwrite, bool padding
   if(ptr == NULL){ return  RB_NULL_ERR; }
   
   _RB_LOCK_();
+
   
   ptr->overwrite = overwrite;
   ptr->padding_matters = padding_matters;
@@ -54,7 +57,7 @@ enum rb_msg ringbf_config(struct ring_buffer * ptr, bool overwrite, bool padding
   ptr->lock = false;
 
 
-  return RB_SUCESS;
+  return RB_SUCCESS;
 }
 
 
@@ -73,12 +76,12 @@ enum rb_msg ringbf_clear(struct ring_buffer * ptr){
   ptr->lock = false;
 
 
-  return RB_SUCESS;
+  return RB_SUCCESS;
 }
 
 
 
-enum rb_msg ringbf_push(struct ring_buffer * ptr, const void * data_in, uint16_t * lenght_in_bytes){
+enum rb_msg ringbf_push(struct ring_buffer * ptr, const void * data_in, uint16_t * length_in_bytes){
 
   if(ptr == NULL || lenght_in_bytes == NULL || data_in == NULL){ return RB_PARAM_ERR; }
   if(*lenght_in_bytes > ptr->size || *lenght_in_bytes == 0){ return RB_PARAM_ERR; }
@@ -134,21 +137,21 @@ enum rb_msg ringbf_push(struct ring_buffer * ptr, const void * data_in, uint16_t
 
 
 
-enum rb_msg ringbf_pop(struct ring_buffer * ptr, void * data_out, uint16_t* lenght_in_bytes){
+enum rb_msg ringbf_pop(struct ring_buffer * ptr, void * data_out, uint16_t* length_in_bytes){
 
 
-  if(ptr == NULL || lenght_in_bytes == NULL || data_out == NULL){ return RB_PARAM_ERR; }
+  if(ptr == NULL || length_in_bytes == NULL || data_out == NULL){ return RB_PARAM_ERR; }
   
-  if(*lenght_in_bytes > ptr->size || *lenght_in_bytes == 0){ return RB_PARAM_ERR; }
+  if(*length_in_bytes > ptr->size || *length_in_bytes == 0){ return RB_PARAM_ERR; }
 
-  if(ptr->counter == 0){ return RB_EMPY_ERR; }
+  if(ptr->counter == 0){ return RB_EMPTY_ERR; }
 
   _RB_LOCK_();
 
   uint16_t pops_to_do = 0;
   bool lacking_flag = false;
 
-  if(*lenght_in_bytes > ptr->counter){
+  if(*length_in_bytes > ptr->counter){
 
     if(ptr->padding_matters == true){
       
@@ -159,13 +162,13 @@ enum rb_msg ringbf_pop(struct ring_buffer * ptr, void * data_out, uint16_t* leng
     }
     else{
 
-      *lenght_in_bytes = ptr->counter;
+      *length_in_bytes = ptr->counter;
       lacking_flag = true;
        
     }
   }
     
-  pops_to_do = *lenght_in_bytes; 
+  pops_to_do = *length_in_bytes; 
 
   for(uint16_t index = 0U; index < pops_to_do; index++){
 
@@ -184,15 +187,15 @@ enum rb_msg ringbf_pop(struct ring_buffer * ptr, void * data_out, uint16_t* leng
   if(lacking_flag == true){ return RB_BUF_LACKING;}
 
 
-  return RB_SUCESS;
+  return RB_SUCCESS;
 }
 
 
 
-enum rb_msg ringbf_peek(struct ring_buffer * ptr, void * data_out, uint16_t lenght_in_bytes){
+enum rb_msg ringbf_peek(struct ring_buffer * ptr, void * data_out, uint16_t length_in_bytes){
 
 
-  if(ptr == NULL || lenght_in_bytes == 0 || data_out == NULL){ return RB_PARAM_ERR; }
+  if(ptr == NULL || length_in_bytes == 0 || data_out == NULL){ return RB_PARAM_ERR; }
   
   _RB_LOCK_(); 
   
@@ -200,7 +203,7 @@ enum rb_msg ringbf_peek(struct ring_buffer * ptr, void * data_out, uint16_t leng
   uint16_t pops_to_do = 0;
   bool lacking_flag = false;
 
-  if(lenght_in_bytes > ptr->counter){
+  if(length_in_bytes > ptr->counter){
 
     if(ptr->padding_matters == true){
       
@@ -215,7 +218,7 @@ enum rb_msg ringbf_peek(struct ring_buffer * ptr, void * data_out, uint16_t leng
        
     }
 
-  }else{ pops_to_do = lenght_in_bytes; }
+  }else{ pops_to_do = length_in_bytes; }
 
   uint16_t temp_head = ptr->head;
 
@@ -234,12 +237,12 @@ enum rb_msg ringbf_peek(struct ring_buffer * ptr, void * data_out, uint16_t leng
 
   if(lacking_flag == true){ return RB_BUF_LACKING;}
 
-  return RB_SUCESS;
+  return RB_SUCCESS;
 }
 
 
 
-enum rb_msg ringbf_avaliable(struct ring_buffer * ptr, uint16_t * data_out){
+enum rb_msg ringbf_available(struct ring_buffer * ptr, uint16_t * data_out){
 
   if(ptr == NULL || data_out == NULL){ return  RB_NULL_ERR;}
   
@@ -249,7 +252,7 @@ enum rb_msg ringbf_avaliable(struct ring_buffer * ptr, uint16_t * data_out){
 
   ptr->lock = false;
 
-  return RB_SUCESS;
+  return RB_SUCCESS;
 }
 
 
@@ -263,9 +266,15 @@ enum rb_msg ringbf_used(struct ring_buffer * ptr, uint16_t * data_out){
 
   ptr->lock = false;
 
-  return RB_SUCESS;
+  return RB_SUCCESS;
 }
 
+
+
+
+#pragma endregion
+
+#pragma region Critical Section Stubs
 
 __attribute__((weak)) void rb_critical_section(void){ } // Default empty implementation for critical section entry.  
 
@@ -273,4 +282,4 @@ __attribute__((weak)) void rb_critical_section(void){ } // Default empty impleme
 __attribute__((weak)) void rb_critical_exit(void)   { } // Default empty implementation for critical section exit.
 
 
-#pragma end region
+#pragma endregion
