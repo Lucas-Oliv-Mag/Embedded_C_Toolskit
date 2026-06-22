@@ -3,8 +3,13 @@
 Collection of tools for embedded system without RTOS envioriment avaliable.
 
 ## Tools avaliable
-- [Ring buffer](Ring buffer/)
+_..._
 
 ## In development
+- [Ring buffer library](Ring%20buffer/)
+
+* [Ring Buffer Library](Ring buffer/)
+
+## Coming Soon
 - [Queues (in development)](Queues/)
 

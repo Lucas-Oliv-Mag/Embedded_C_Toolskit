@@ -83,12 +83,12 @@ enum rb_msg ringbf_clear(struct ring_buffer * ptr){
 
 enum rb_msg ringbf_push(struct ring_buffer * ptr, const void * data_in, uint16_t * length_in_bytes){
 
-  if(ptr == NULL || lenght_in_bytes == NULL || data_in == NULL){ return RB_PARAM_ERR; }
-  if(*lenght_in_bytes > ptr->size || *lenght_in_bytes == 0){ return RB_PARAM_ERR; }
+  if(ptr == NULL || length_in_bytes == NULL || data_in == NULL){ return RB_PARAM_ERR; }
+  if(*length_in_bytes > ptr->size || *length_in_bytes == 0){ return RB_PARAM_ERR; }
 
   _RB_LOCK_();
 
-  if(ptr->overwrite == false && (*lenght_in_bytes + ptr->counter) > ptr->size){
+  if(ptr->overwrite == false && (*length_in_bytes + ptr->counter) > ptr->size){
 
     if(ptr->padding_matters == true){
       
@@ -97,14 +97,14 @@ enum rb_msg ringbf_push(struct ring_buffer * ptr, const void * data_in, uint16_t
        
     }else{
 
-      *lenght_in_bytes = ptr->size - ptr->counter; // adjust the push size to fit the remaining space.
+      *length_in_bytes = ptr->size - ptr->counter; // adjust the push size to fit the remaining space.
 
     }
     
 
-  }else if(ptr->overwrite == true && (*lenght_in_bytes + ptr->counter) > ptr->size){
+  }else if(ptr->overwrite == true && (*length_in_bytes + ptr->counter) > ptr->size){
 
-    uint16_t bytes_to_overwrite = (*lenght_in_bytes + ptr->counter) - ptr->size;
+    uint16_t bytes_to_overwrite = (*length_in_bytes + ptr->counter) - ptr->size;
 
     #ifdef _RB_OPTIMIZED_VERSION
       ptr->head = (ptr->head + bytes_to_overwrite) & (ptr->size - 1); // optimized wrap-around using bitwise AND for power of 2 sizes.
@@ -116,7 +116,7 @@ enum rb_msg ringbf_push(struct ring_buffer * ptr, const void * data_in, uint16_t
 
   } 
 
-  for(uint16_t index = 0; index < *lenght_in_bytes; index++){
+  for(uint16_t index = 0; index < *length_in_bytes; index++){
   
       ptr->buffer[ ptr->tail ] = ((uint8_t *)data_in)[index];    
       #ifdef _RB_OPTIMIZED_VERSION
@@ -127,12 +127,12 @@ enum rb_msg ringbf_push(struct ring_buffer * ptr, const void * data_in, uint16_t
 
   }
 
-  ptr->counter = (ptr->counter + *lenght_in_bytes > ptr->size) ? ptr->size : ptr->counter + *lenght_in_bytes;
+  ptr->counter = (ptr->counter + *length_in_bytes > ptr->size) ? ptr->size : ptr->counter + *length_in_bytes;
 
   ptr->lock = false;
   
 
-  return RB_SUCESS;
+  return RB_SUCCESS;
 }
 
 
